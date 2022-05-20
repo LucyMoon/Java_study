@@ -65,9 +65,6 @@ public class SimpleCommander {
 		System.out.print(buffer.toString());
 	}
 	
-	public static void main(String[] args) {
-		SimpleCommander cmd = new SimpleCommander();
-		cmd.execute();
-	}
+	
 	
 }

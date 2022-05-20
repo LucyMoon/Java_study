@@ -8,62 +8,53 @@ public class CommandLs extends AbstractCommand {
 
 	public CommandLs(File currentDirectory, String commandLine) {
 		super(currentDirectory, commandLine);
+		File dir = currentDirectory;
+		String[] list = dir.list();
+		File[] listsFiles = dir.listFiles();
+		for (File file : listsFiles) {
+			if (file != null) {
+				String date = formateDate(file.lastModified());
+				String pdir = "";
+				if (file.isDirectory()) {
+					pdir = "<dir>";
+				}
+				long Fsize = file.length();
+				int countsize = 0;
+				String Size = "B";
+				while (Fsize >= 1024) {
+					Fsize /= 1024;
+					countsize++;
+				}
+				switch (countsize) {
+				case 1:
+					Size = "KB";
+				case 2:
+					Size = "MB";
+				case 3:
+					Size = "GB";
+				case 4:
+					Size = "TB";
+				default : 
+					Size = "B";
+				}
+				System.out.printf("%s %5s %4d%2s %s\n", date, pdir, Fsize, Size, file.getName());
+			}
+		}
+	}
+
+	public Date makeDate(long unixTime) {
+		return new Date(unixTime);
+	}
+
+	public String formateDate(long l) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:dd:ss");
+		return dateFormat.format(l);
+
 	}
 
 	@Override
 	public File executeCommand() {
-		File dir = currentDirectory;
-		
-		String[] list = dir.list();
-		long time = 0;
-		for (String name : list) {
-			time = new File(currentDirectory + name).lastModified();
-			System.out.print(formatDate(convertToDate(time)) + " ");
-			if(new File(currentDirectory + name).isDirectory()) {
-				System.out.print("<DIR> ");
-			} else {
-				System.out.print("      ");
-			}
-			long size = new File(currentDirectory + name).length();
-			int size2 = 0;
-			while(size >= 1024) {
-				size /= 1024;
-				size2 ++;
-			}
-			String size3 = "";
-			
-			
-			switch (size2) {
-			case 0 :
-				size3 = "byte";
-				break;
-			case 1 :
-				size3 = "KB";
-				break;
-			case 2 :
-				size3 = "MB";
-				break;
-			case 3 :
-				size3 = "GB";
-			}
-			
-			
-			
-			System.out.printf("%4d %4s ", size, size3);
-			System.out.println(name);
-		}
-		
-		return currentDirectory;
+		return this.currentDirectory;
 	}
-	
-	public Date convertToDate(long unixTime) {
-		return new Date(unixTime);
-	}
-	
-	public String formatDate(Date date) {
-		SimpleDateFormat dateFormat = 
-				new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return dateFormat.format(date);
-	}
-	
+
 }
