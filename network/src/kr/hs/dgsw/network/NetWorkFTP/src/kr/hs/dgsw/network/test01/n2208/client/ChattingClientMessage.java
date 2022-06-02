@@ -13,8 +13,11 @@ public class ChattingClientMessage {
 			OutputMessage om = new OutputMessage(sc);
 			om.start();
 			
-			InputMessage im = new InputMessage(sc);
+			InputMessage im = new InputMessage(sc, om);
 			im.start();
+			
+			im.join();
+			om.interrupt();
 		} catch(Exception e) {
 			System.out.println("연결 종료");
 			e.printStackTrace();

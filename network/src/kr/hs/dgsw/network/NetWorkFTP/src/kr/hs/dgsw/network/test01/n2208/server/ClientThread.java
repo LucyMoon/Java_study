@@ -1,6 +1,12 @@
 package kr.hs.dgsw.network.test01.n2208.server;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,47 +25,17 @@ public class ClientThread extends Thread {
 		this.ca = ca;
 		this.address = address;
 		ClientList.add(this);
-//		notMeMessage("[Start]\r\n"
-//				+ "Type::LogIn\r\n"
-//				+ "FromNick::"+address+"\r\n"
-//				+ "[End]");
 	}
 
-//	public boolean containsNickname(String nickname) {
-//		for(ClientThread cttmp:ClientList) {
-//			if(cttmp.nickname.equals(nickname)) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
 
-	public void sendMessage(String msg) {
-		ca.sendMessage(msg);
-	}
-
-//	// 전체에게 메시지 발송
-//	public void allMessage(String msg) {
-//		for(ClientThread cttmp:ClientList) {
-//			cttmp.sendMessage(msg);			// 출력
-//		}
-//	}
-
-	// 특정인에게 발송
 	public void message(String msg, String address) {
 		for (ClientThread cttmp : ClientList) {
 			if (cttmp.address.equals(address))
-				cttmp.sendMessage(msg); // 출력
+				ca.sendMessage(msg); // 출력
 		}
 	}
 
-//	// 나 제외하고 발송
-//	public void notMeMessage(String msg) {
-//		for(ClientThread cttmp:ClientList) {
-//			if(cttmp != this)
-//				cttmp.sendMessage(msg);			// 출력
-//		}
-//	}
+
 
 	public void run() {
 		try {
@@ -71,6 +47,14 @@ public class ClientThread extends Thread {
 				String msgFilePath = "";
 				String msgFileName = "";
 				String msgDownFileName= "";
+				String ID = "";
+				String PW = "";
+				String Size = "";
+				String Fname = "";
+				String SendFilePath = "";
+				String FN = "";
+				String ET = "";
+				msgType = "";
 				
 				if(brmsg.equals("[Start]")) {
 					brmsg = ca.readMessage();
@@ -86,41 +70,76 @@ public class ClientThread extends Thread {
 					while(!(brmsg = ca.readMessage()).equals("[End]")) {
 						brmsgarr = brmsg.split("::");
 						switch(brmsgarr[0]) {
-						case "DownFileName":
+						case "DownFilename":
 							msgDownFileName = brmsgarr[1]; break;
+						case "ID":
+							ID = brmsgarr[1]; break;
+						case "PW":
+							PW = brmsgarr[1]; break;
+						case "Size":
+							Size = brmsgarr[1]; break;
+						case "Filename":
+							Fname = brmsgarr[1]; break;
+						case "SendFilePath":
+							SendFilePath = brmsgarr[1];break;
+						case "FN":
+							FN = brmsgarr[1];break;
+						case "ET":
+							ET = brmsgarr[1]; break;
 						default:
 							break;
 						}
 					}
-					System.out.println(msgType);
 					
 					switch(msgType) {
-//						case "LogIn":
-//							//?
-//							allMessage("[Start]\r\n"
-//									+ "Type::LogIn\r\n"
-//									+ "FromNick::" + this.nickname + "\r\n"
-//									+ "[End]");
-//							break;
-//						case "LogOut":
-//							//?
-//							ClientList.remove(this);
-//							loginboolean = false;
-//							notMeMessage("[Start]\r\n"
-//									+ "Type::FileList\r\n"
-//									+ "FromNick::" + this.nickname + "\r\n"
-//									+ "[End]");
-//							sendMessage("[Start]\r\n"
-//									+ "Type::LogOutOK\r\n"
-//									+ "[End]");
-//							break;
+						case "Login":
+							if(ID.equals("admin") && PW.equals("1234")) {
+								message("[Start]\r\n"
+										+ "Type::Login\r\n"
+										+ "CheckLogin::" + "OK" + "\r\n"
+										+ "[End]",
+										this.address);
+							} else {
+								message("[Start]\r\n"
+										+ "Type::Login\r\n"
+										+ "CheckLogin::" + "Fail" + "\r\n"
+										+ "[End]",
+										this.address);
+							}
+							break;
 						case "Upload":
-							String Fname = ca.readFile();
-							message("[Start]\r\n"
-									+ "Type::Upload\r\n"
-									+ "FName::" + Fname + "\r\n"
-									+ "[End]",
-									this.address);
+						
+
+							File fl = new File("D:/temp/"+FN+ET);
+							
+
+							if(fl.exists()) {
+								message("[Start]\r\n"
+										+ "Type::CheckUpload\r\n"
+										+ "Check::NO\r\n"
+										+ "CheckFilePath::"+SendFilePath+"\r\n"
+										+ "CheckFN::"+FN+"\r\n"
+										+ "[End]",
+										this.address);
+							}else {
+								message("[Start]\r\n"
+										+ "Type::CheckUpload\r\n"
+										+ "Check::YES\r\n"
+										+ "CheckFilePath::"+SendFilePath+"\r\n"
+										+ "CheckFN::"+FN+"\r\n"
+										+ "[End]",
+										this.address);
+							}
+							break;
+						case "UploadOK":
+
+							ca.UploadFile(Fname, Size);
+							
+								message("[Start]\r\n"
+										+ "Type::Upload\r\n"
+										+ "FName::" + Fname + "\r\n"
+										+ "[End]",
+										this.address);
 							break;
 						case "FileList":
 							message("[Start]\r\n"
@@ -130,46 +149,54 @@ public class ClientThread extends Thread {
 									+ "[End]",
 									this.address);
 							break;
-//						case "Whisper":
-//							if(containsNickname(msgToNick)) {
-//								message("[Start]\r\n"
-//										+ "Type::Whisper\r\n"
-//										+ "FromNick::"+ this.nickname +"\r\n"
-//										+ "Message::\r\n"
-//										+ msgMessage
-//										+ "::Message\r\n"
-//										+ "[End]", msgToNick);
-//								sendMessage("[Start]\r\n"
-//										+ "Type::WhisperOK\r\n"
-//										+ "[End]");
-//							} else {
-//								sendMessage("[Start]\r\n"
-//										+ "Type::WhisperWhithout\r\n"
-//										+ "[End]");
-//							}
-//							break;
-//						case "AllMessage":
-//							notMeMessage("[Start]\r\n"
-//									+ "Type::AllMessage\r\n"
-//									+ "FromNick::"+ this.nickname +"\r\n"
-//									+ "Message::\r\n"
-//									+ msgMessage
-//									+ "::Message\r\n"
-//									+ "[End]");
-//							break;
-//						case "NickList":
-//							String tmpmsg="[Start]\r\n"
-//									+ "Type::NickList\r\n"
-//									+ "JoinCount::" + ClientList.size() + "\r\n"
-//									+ "Message::\r\n";
-//							for(ClientThread tmpcl:ClientList) {
-//								tmpmsg += tmpcl.nickname +"\r\n";
-//							}
-//							tmpmsg += "::Message\r\n"
-//									+ "[End]";
-//							sendMessage(tmpmsg);
-//							break;
+						case "DownLoad":
+							fl = new File("D:/temp/"+msgDownFileName);
+							if(fl.exists()) {
+								FileInputStream fis = new FileInputStream(fl);
+								BufferedInputStream bis = new BufferedInputStream(fis);
+								OutputStream os = null;
+								try {
+									os = ca.sc.getOutputStream();
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								BufferedOutputStream bor = new BufferedOutputStream(os);
+								DataOutputStream dos = new DataOutputStream(bor);
+								long tempSize = fl.length();
+
+								message("[Start]\r\n"
+										+ "Type::FileDown\r\n"
+										+ "Filename::"+fl.getName() + "\r\n"
+										+ "Size::"+fl.length() + "\r\n"
+										+ "[End]",
+										this.address);
+								
+								int readsize = 0;
+								byte[] bytes = new byte[1024 * 8];
+								
+								while((readsize = fis.read(bytes)) <= tempSize) {
+									tempSize -= readsize;
+									dos.write(bytes, 0, readsize);
+									if(tempSize == 0) {
+										break;
+									}
+								}
+								dos.flush();
+							} else {
+								message("[Start]\r\n"
+										+ "Type::NoFile\r\n"
+										+ "[End]",
+										this.address);
+							}
+							
+							break;
+						case "Logout":
+							this.ca.sc.close();
+							ClientList.remove(this);
+							break;
 					}
+					
 					
 				}
 			}

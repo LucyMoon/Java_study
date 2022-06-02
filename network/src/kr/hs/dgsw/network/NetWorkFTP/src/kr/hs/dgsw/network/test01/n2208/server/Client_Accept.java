@@ -1,8 +1,10 @@
 package kr.hs.dgsw.network.test01.n2208.server;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +20,7 @@ public class Client_Accept {
 	private PrintWriter pw = null;
 	private BufferedReader br = null;
 	private DataInputStream dis = null;
+	
 	
 	// »ý¼º
 	public Client_Accept(Socket sc) {
@@ -55,17 +58,26 @@ public class Client_Accept {
 		return br.readLine();
 	}
 	
-	public String readFile() throws IOException {
-		String filename = dis.readUTF();
-		
-		FileOutputStream fos = new FileOutputStream("D:\\temp\\" + filename);
-		
-		int readsize = 0;
-		byte[] bytes = new byte[1024];
-		
-		while((readsize = dis.read(bytes)) != -1) {
-			fos.write(bytes, 0, readsize);
+	public void UploadFile(String filename, String Size) {
+		int TempSize = Integer.parseInt(Size);
+		try {
+			FileOutputStream fos = new FileOutputStream("D:\\temp\\" + filename.trim());
+			
+			int readsize = 0;
+			byte[] bytes = new byte[1024 * 8];
+			while((readsize = dis.read(bytes)) <= TempSize) {
+				TempSize -= readsize;
+				fos.write(bytes, 0, readsize);
+//				System.out.println(TempSize);
+				if(TempSize <= 0) {
+					break;
+				}
+			}
+			fos.flush();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return filename;
+		
 	}
 }
