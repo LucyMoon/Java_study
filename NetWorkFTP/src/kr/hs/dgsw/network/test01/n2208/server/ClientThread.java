@@ -20,6 +20,8 @@ public class ClientThread extends Thread {
 
 	private Client_Accept ca = null;
 	private String address = null;
+	
+	private String Path = "D:/temp/";
 
 	public ClientThread(String address, Client_Accept ca) {
 		this.ca = ca;
@@ -27,15 +29,12 @@ public class ClientThread extends Thread {
 		ClientList.add(this);
 	}
 
-
 	public void message(String msg, String address) {
 		for (ClientThread cttmp : ClientList) {
 			if (cttmp.address.equals(address))
 				ca.sendMessage(msg); // Ãâ·Â
 		}
 	}
-
-
 
 	public void run() {
 		try {
@@ -110,7 +109,7 @@ public class ClientThread extends Thread {
 						case "Upload":
 						
 
-							File fl = new File("D:/temp/"+FN+ET);
+							File fl = new File(Path+FN+ET);
 							
 
 							if(fl.exists()) {
@@ -150,7 +149,7 @@ public class ClientThread extends Thread {
 									this.address);
 							break;
 						case "DownLoad":
-							fl = new File("D:/temp/"+msgDownFileName);
+							fl = new File(Path+msgDownFileName);
 							if(fl.exists()) {
 								FileInputStream fis = new FileInputStream(fl);
 								BufferedInputStream bis = new BufferedInputStream(fis);
@@ -195,9 +194,7 @@ public class ClientThread extends Thread {
 							this.ca.sc.close();
 							ClientList.remove(this);
 							break;
-					}
-					
-					
+					}	
 				}
 			}
 		} catch(Exception e) {
@@ -207,7 +204,7 @@ public class ClientThread extends Thread {
 	}
 
 	private ArrayList<String> getFileSizeList() {
-		File dir = new File("D:\\temp");
+		File dir = new File(Path);
 		File[] listsFiles = dir.listFiles();
 		ArrayList<String> FileSize = new ArrayList<String>();
 		for (File file : listsFiles) {
@@ -221,15 +218,15 @@ public class ClientThread extends Thread {
 				}
 				switch (countsize) {
 				case 1:
-					Size = "KB";
+					Size = "KB"; break;
 				case 2:
-					Size = "MB";
+					Size = "MB"; break;
 				case 3:
-					Size = "GB";
+					Size = "GB"; break;
 				case 4:
-					Size = "TB";
+					Size = "TB"; break;
 				default:
-					Size = "B";
+					Size = "B"; break;
 				}
 
 				FileSize.add(Long.toString(Fsize) + Size);
@@ -239,7 +236,7 @@ public class ClientThread extends Thread {
 	}
 
 	private ArrayList<String> getFileNameList() {
-		File dir = new File("D:\\temp");
+		File dir = new File(Path);
 		File[] listsFiles = dir.listFiles();
 		ArrayList<String> FileName = new ArrayList<String>();
 		for (File file : listsFiles) {

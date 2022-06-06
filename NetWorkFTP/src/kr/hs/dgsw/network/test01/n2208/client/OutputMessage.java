@@ -112,17 +112,19 @@ public class OutputMessage extends Thread {
 									}
 									break;
 								}else {
-									path = msg.trim();
+									path=msg.trim();
+
 									fl = new File(path);
-									int tempint = 0;
+									int tempint = 3;
 									if(fl.exists()) {
 										for(int i = path.length(); i > 0; i--) {
-											if(path.substring(i-1, i).equals("/")) {
+											if(path.substring(i-1, i).equals("\\")) {
 												tempint = i+1;
 												i = 0;
 											}
 										}
 										filename = msg.substring(tempint, msg.indexOf('.'));
+
 										et = msg.substring(msg.indexOf('.'), msg.length());
 										sandmsg = "[Start]\r\n"
 												+ "Type::Upload\r\n"
@@ -180,7 +182,6 @@ public class OutputMessage extends Thread {
 			}
 		}
 		dos.flush();
-
 		
 	}
 	

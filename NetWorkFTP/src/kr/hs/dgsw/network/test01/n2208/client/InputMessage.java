@@ -14,6 +14,7 @@ import java.util.Scanner;
 public class InputMessage extends Thread {
 	private Socket sc = null;
 	private OutputMessage om = null;
+	private String DownPath = "D:\\down\\";
 	
 
 	
@@ -123,7 +124,7 @@ public class InputMessage extends Thread {
 							BufferedInputStream bir = new BufferedInputStream(is);
 							DataInputStream dis = new DataInputStream(bir);
 							try {
-								FileOutputStream fos = new FileOutputStream("D:\\down\\" + Filename);
+								FileOutputStream fos = new FileOutputStream(DownPath + Filename);
 								
 								int readsize = 0;
 								byte[] bytes = new byte[1024 * 8];
