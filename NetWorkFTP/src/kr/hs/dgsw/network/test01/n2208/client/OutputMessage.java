@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -169,15 +170,16 @@ public class OutputMessage extends Thread {
 	
 	public void UploadFile(String CheckFilePath) throws IOException {
 		File FP = new File(CheckFilePath);
-		long tempsize = FP.length();
+		BigInteger tempsize = BigInteger.valueOf(FP.length());
 
 		FileInputStream fis = new FileInputStream(FP);
 		int readsize = 0;
-		byte[] bytes = new byte[1024 * 8];
-		while((readsize = fis.read(bytes)) <= tempsize) {
-			tempsize -= readsize;
+		byte[] bytes = new byte[1024 * 64];
+		while(true) {
+			readsize = fis.read(bytes);
+			tempsize = tempsize.subtract(BigInteger.valueOf(readsize));
 			dos.write(bytes, 0, readsize);
-			if(tempsize == 0) {
+			if(tempsize.compareTo(BigInteger.ZERO) == 0) {
 				break;
 			}
 		}

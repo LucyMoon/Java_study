@@ -15,7 +15,6 @@ public class ChattingClientMessage {
 			
 			InputMessage im = new InputMessage(sc, om);
 			im.start();
-			
 			im.join();
 			om.interrupt();
 		} catch(Exception e) {

@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.net.Socket;
 
 public class Client_Accept {
@@ -59,17 +60,17 @@ public class Client_Accept {
 	}
 	
 	public void UploadFile(String filename, String Size) {
-		int TempSize = Integer.parseInt(Size);
+		BigInteger TempSize = BigInteger.valueOf(Long.parseLong(Size));
 		try {
 			FileOutputStream fos = new FileOutputStream("D:\\temp\\" + filename.trim());
 			
 			int readsize = 0;
-			byte[] bytes = new byte[1024 * 8];
-			while((readsize = dis.read(bytes)) <= TempSize) {
-				TempSize -= readsize;
+			byte[] bytes = new byte[1024 * 64];
+			while(true) {
+				readsize = dis.read(bytes);
+				TempSize = TempSize.subtract(BigInteger.valueOf(readsize));
 				fos.write(bytes, 0, readsize);
-//				System.out.println(TempSize);
-				if(TempSize <= 0) {
+				if(TempSize.compareTo(BigInteger.ZERO) == 0) {
 					break;
 				}
 			}
